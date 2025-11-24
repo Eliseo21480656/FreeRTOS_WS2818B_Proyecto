@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AirGuard 4.0 - Monitoreo Ambiental</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0088CC;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #3B82F6;
+            --bg-color: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,136,204,0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background: #006ba3;
+        }
+
+        .login-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .message {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .message.success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        /* App Container */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .header-btn:active {
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Connection Banner */
+        .connection-banner {
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .connection-banner.connected {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 2px solid #10B981;
+        }
+
+        .connection-banner.disconnected {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 2px solid #EF4444;
+        }
+
+        .connection-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .connection-dot.connected {
+            background: #10B981;
+            animation: pulse 2s infinite;
+        }
+
+        .connection-dot.disconnected {
+            background: #EF4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            padding: 1rem 1.25rem;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 90px;
+        }
+
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 136, 204, 0.3);
+        }
+
+        .tab-icon {
+            font-size: 1.75rem;
+        }
+
+        .tab-label {
+            font-size: 0.85rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        /* Sensor Grid */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Sensor Card with Gauge */
+        .sensor-card-gauge {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .sensor-card-gauge:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .sensor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .sensor-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .sensor-icon {
+            font-size: 1.5rem;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 100%;
+            height: 120px;
+            margin: 1rem 0;
+        }
+
+        .gauge-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-value-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .gauge-value-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .gauge-value-unit {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .sensor-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.good {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-badge.moderate {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-badge.unhealthy {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .sensor-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sensor-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-btn-text {
+                display: none;
+            }
+
+            .header-btn {
+                padding: 0.75rem;
+                min-width: 50px;
+                justify-content: center;
+            }
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Firebase Status */
+        .firebase-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 999;
+            font-size: 0.85rem;
+        }
+
+        .firebase-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .firebase-dot.connected {
+            background: #10B981;
+            animation: pulse 2s infinite;
+        }
+
+        .firebase-dot.disconnected {
+            background: #EF4444;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <div class="login-logo">
+                <div class="login-logo-icon">⚡</div>
+                <h1 class="login-title">AirGuard 4.0</h1>
+                <p class="login-subtitle">Sistema de Monitoreo Ambiental ITNL</p>
+            </div>
+
+            <div id="loginError" class="message error"></div>
+            <div id="loginSuccess" class="message success"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" id="email" class="form-input" placeholder="Admin@monitoreo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" id="password" class="form-input" placeholder="Tu contraseña" required>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    Iniciar Sesión
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">
+                <p>Usuario: Admin@monitoreo.com</p>
+                <p>Password: Monitoreo#2025</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appContainer" class="app-container">
+        <!-- Firebase Status Indicator -->
+        <div class="firebase-status" id="firebaseStatus">
+            <div class="firebase-dot disconnected"></div>
+            <span>Firebase: Conectando...</span>
+        </div>
+
+        <div class="header">
+            <div class="header-content">
+                <div class="app-title">
+                    <span>⚡</span>
+                    <span>AirGuard 4.0</span>
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" onclick="refreshData()">
+                        <span class="header-btn-icon">🔄</span>
+                        <span class="header-btn-text">Actualizar</span>
+                    </button>
+                    <button class="header-btn" onclick="logout()">
+                        <span class="header-btn-icon">🚪</span>
+                        <span class="header-btn-text">Salir</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Connection Status -->
+            <div id="connectionBanner" class="connection-banner disconnected">
+                <div class="connection-dot disconnected"></div>
+                <span id="connectionText">Desconectado - El sensor no está enviando datos</span>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('dashboard')">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-label">Dashboard</span>
+                </button>
+                <button class="tab" onclick="switchTab('datos')">
+                    <span class="tab-icon">📋</span>
+                    <span class="tab-label">Datos</span>
+                </button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">Variables Críticas</div>
+                    <div class="sensor-grid">
+                        <!-- CO -->
+                        <div class="sensor-card-gauge">
+                            <div class="sensor-header">
+                                <span class="sensor-name">CO (Monóxido)</span>
+                                <span class="sensor-icon">☁️</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="gaugeCO" class="gauge-canvas"></canvas>
+                                <div class="gauge-value-display">
+                                    <div class="gauge-value-number" id="valueCO">--</div>
+                                    <div class="gauge-value-unit">ppm</div>
+                                </div>
+                            </div>
+                            <div class="sensor-status-bar">
+                                <span class="status-badge good" id="statusCO">Sin datos</span>
+                                <span class="sensor-timestamp" id="timeCO">--</span>
+                            </div>
+                        </div>
+
+                        <!-- CO2 -->
+                        <div class="sensor-card-gauge">
+                            <div class="sensor-header">
+                                <span class="sensor-name">CO2 (Dióxido)</span>
+                                <span class="sensor-icon">💨</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="gaugeCO2" class="gauge-canvas"></canvas>
+                                <div class="gauge-value-display">
+                                    <div class="gauge-value-number" id="valueCO2">--</div>
+                                    <div class="gauge-value-unit">ppm</div>
+                                </div>
+                            </div>
+                            <div class="sensor-status-bar">
+                                <span class="status-badge good" id="statusCO2">Sin datos</span>
+                                <span class="sensor-timestamp" id="timeCO2">--</span>
+                            </div>
+                        </div>
+
+                        <!-- PM2.5 -->
+                        <div class="sensor-card-gauge">
+                            <div class="sensor-header">
+                                <span class="sensor-name">PM2.5</span>
+                                <span class="sensor-icon">🌫️</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="gaugePM25" class="gauge-canvas"></canvas>
+                                <div class="gauge-value-display">
+                                    <div class="gauge-value-number" id="valuePM25">--</div>
+                                    <div class="gauge-value-unit">µg/m³</div>
+                                </div>
+                            </div>
+                            <div class="sensor-status-bar">
+                                <span class="status-badge good" id="statusPM25">Sin datos</span>
+                                <span class="sensor-timestamp" id="timePM25">--</span>
+                            </div>
+                        </div>
+
+                        <!-- PM10 -->
+                        <div class="sensor-card-gauge">
+                            <div class="sensor-header">
+                                <span class="sensor-name">PM10</span>
+                                <span class="sensor-icon">🌪️</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="gaugePM10" class="gauge-canvas"></canvas>
+                                <div class="gauge-value-display">
+                                    <div class="gauge-value-number" id="valuePM10">--</div>
+                                    <div class="gauge-value-unit">µg/m³</div>
+                                </div>
+                            </div>
+                            <div class="sensor-status-bar">
+                                <span class="status-badge good" id="statusPM10">Sin datos</span>
+                                <span class="sensor-timestamp" id="timePM10">--</span>
+                            </div>
+                        </div>
+
+                        <!-- Temperature -->
+                        <div class="sensor-card-gauge">
+                            <div class="sensor-header">
+                                <span class="sensor-name">Temperatura</span>
+                                <span class="sensor-icon">🌡️</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="gaugeTemp" class="gauge-canvas"></canvas>
+                                <div class="gauge-value-display">
+                                    <div class="gauge-value-number" id="valueTemp">--</div>
+                                    <div class="gauge-value-unit">°C</div>
+                                </div>
+                            </div>
+                            <div class="sensor-status-bar">
+                                <span class="status-badge good" id="statusTemp">Normal</span>
+                                <span class="sensor-timestamp" id="timeTemp">--</span>
+                            </div>
+                        </div>
+
+                        <!-- Pressure -->
+                        <div class="sensor-card-gauge">
+                            <div class="sensor-header">
+                                <span class="sensor-name">Presión</span>
+                                <span class="sensor-icon">📊</span>
+                            </div>
+                            <div class="gauge-container">
+                                <canvas id="gaugePressure" class="gauge-canvas"></canvas>
+                                <div class="gauge-value-display">
+                                    <div class="gauge-value-number" id="valuePressure">--</div>
+                                    <div class="gauge-value-unit">Pa</div>
+                                </div>
+                            </div>
+                            <div class="sensor-status-bar">
+                                <span class="status-badge good" id="statusPressure">Normal</span>
+                                <span class="sensor-timestamp" id="timePressure">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Datos Tab -->
+            <div id="datos" class="tab-content">
+                <div class="card">
+                    <div class="card-header">Lecturas Guardadas en Firebase</div>
+                    <div id="readingsCount" style="text-align: center; padding: 2rem; font-size: 3rem; color: var(--primary-color);">
+                        0
+                    </div>
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        Lecturas almacenadas en la nube
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-top: 1.5rem; padding-bottom: 1rem;">
+                Última actualización: <span id="lastUpdate">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // ========== FIREBASE CONFIGURATION ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXf14TEST2aoTbiA-ciF2Dm9_oYCddp3g",
+            authDomain: "app-monitoreo-itnl-v0.firebaseapp.com",
+            databaseURL: "https://app-monitoreo-itnl-v0-default-rtdb.firebaseio.com",
+            projectId: "app-monitoreo-itnl-v0",
+            storageBucket: "app-monitoreo-itnl-v0.firebasestorage.app",
+            messagingSenderId: "488643441374",
+            appId: "1:488643441374:web:d4cced988c096d31e8884f",
+            measurementId: "G-TSGSVNVWC2"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // PARTICLE CONFIGURATION
+        const PARTICLE_CONFIG = {
+            accessToken: '8f0d800844891a8dc5f62d09a8c9da7c41a92960',
+            eventName: 'sensor_data',
+            apiUrl: 'https://api.particle.io/v1/devices/events/sensor_data'
+        };
+
+        // SENSOR THRESHOLDS
+        const THRESHOLDS = {
+            CO: { good: 9, moderate: 35, unhealthy: 50, min: 0, max: 100 },
+            CO2: { good: 1000, moderate: 2000, unhealthy: 5000, min: 0, max: 5000 },
+            PM25: { good: 12, moderate: 35.4, unhealthy: 55.4, min: 0, max: 150 },
+            PM10: { good: 54, moderate: 154, unhealthy: 254, min: 0, max: 350 },
+            Temperature: { good: 25, moderate: 30, unhealthy: 35, min: -10, max: 50 },
+            Pressure: { good: 1013, moderate: 1020, unhealthy: 1030, min: 950, max: 1050 }
+        };
+
+        // Global Variables
+        let currentUser = null;
+        let eventSource = null;
+        let gauges = {};
+        let readingsCount = 0;
+
+        // ========== LOGIN ==========
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleLogin();
+        });
+
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+            const successDiv = document.getElementById('loginSuccess');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Iniciando sesión...';
+            errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                console.log('✅ Login exitoso:', currentUser.email);
+                
+                successDiv.textContent = '¡Bienvenido! Cargando aplicación...';
+                successDiv.classList.add('show');
+
+                setTimeout(() => {
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('appContainer').classList.add('active');
+                    initializeApp();
+                }, 1000);
+
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                let errorMessage = 'Error al iniciar sesión';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'Usuario no encontrado';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Contraseña incorrecta';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Correo electrónico inválido';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                errorDiv.textContent = errorMessage;
+                errorDiv.classList.add('show');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Iniciar Sesión';
+            }
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                }
+                document.getElementById('appContainer').classList.remove('active');
+                document.getElementById('loginContainer').style.display = 'flex';
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+            });
+        }
+
+        // ========== FIREBASE REALTIME SYNC ==========
+        function setupFirebaseListeners() {
+            // Listen to connection state
+            database.ref('.info/connected').on('value', (snapshot) => {
+                const connected = snapshot.val();
+                updateFirebaseStatus(connected);
+            });
+
+            // Listen to latest sensor data
+            database.ref('sensor_data/latest').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    console.log('📡 Datos de Firebase:', data);
+                    updateAllSensors(data);
+                }
+            });
+
+            // Count readings
+            database.ref('sensor_data/history').on('value', (snapshot) => {
+                const data = snapshot.val();
+                readingsCount = data ? Object.keys(data).length : 0;
+                document.getElementById('readingsCount').textContent = readingsCount;
+            });
+        }
+
+        function updateFirebaseStatus(connected) {
+            const status = document.getElementById('firebaseStatus');
+            const dot = status.querySelector('.firebase-dot');
+            const text = status.querySelector('span');
+
+            if (connected) {
+                dot.classList.remove('disconnected');
+                dot.classList.add('connected');
+                text.textContent = 'Firebase: Conectado';
+            } else {
+                dot.classList.remove('connected');
+                dot.classList.add('disconnected');
+                text.textContent = 'Firebase: Desconectado';
+            }
+        }
+
+        function saveSensorDataToFirebase(data) {
+            if (!currentUser) return;
+
+            const timestamp = Date.now();
+            const dataWithTimestamp = {
+                ...data,
+                timestamp: timestamp,
+                user: currentUser.uid,
+                dateString: new Date(timestamp).toLocaleString('es-MX')
+            };
+
+            // Save to latest
+            database.ref('sensor_data/latest').set(dataWithTimestamp);
+
+            // Save to history
+            database.ref(`sensor_data/history/${timestamp}`).set(dataWithTimestamp);
+
+            console.log('💾 Datos guardados en Firebase');
+        }
+
+        // ========== PARTICLE CONNECTION ==========
+        function connectToParticle() {
+            try {
+                const url = `${PARTICLE_CONFIG.apiUrl}?access_token=${PARTICLE_CONFIG.accessToken}`;
+                
+                console.log('🔌 Conectando a Particle Cloud...');
+                eventSource = new EventSource(url);
+                
+                eventSource.onopen = function() {
+                    console.log('✅ Conectado a Particle');
+                    updateConnectionStatus('connected');
+                };
+                
+                eventSource.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        if (data.data) {
+                            const sensorData = JSON.parse(data.data);
+                            console.log('📊 Datos recibidos:', sensorData);
+                            updateAllSensors(sensorData);
+                            saveSensorDataToFirebase(sensorData);
+                        }
+                    } catch (error) {
+                        console.error('❌ Error:', error);
+                    }
+                };
+                
+                eventSource.onerror = function(error) {
+                    console.error('❌ Error Particle:', error);
+                    updateConnectionStatus('disconnected');
+                };
+                
+            } catch (error) {
+                console.error('❌ Error conectando:', error);
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            const banner = document.getElementById('connectionBanner');
+            const dot = banner.querySelector('.connection-dot');
+            const text = document.getElementById('connectionText');
+            
+            banner.classList.remove('connected', 'disconnected');
+            dot.classList.remove('connected', 'disconnected');
+            
+            banner.classList.add(status);
+            dot.classList.add(status);
+            
+            if (status === 'connected') {
+                text.textContent = 'Conectado - Recibiendo datos en tiempo real';
+            } else {
+                text.textContent = 'Desconectado - El sensor no está enviando datos';
+            }
+        }
+
+        // ========== SENSOR UPDATES ==========
+        function updateAllSensors(data) {
+            // Calculate CO and CO2 from analog sensors
+            const coValue = data.MQ7 ? (data.MQ7 * 0.005) : 0;
+            const co2Value = data.MQ135 ? (data.MQ135 * 0.5) : 400;
+            
+            updateSensorWithGauge('CO', coValue, 'ppm');
+            updateSensorWithGauge('CO2', co2Value, 'ppm');
+            updateSensorWithGauge('PM25', data['PM2.5'], 'µg/m³');
+            updateSensorWithGauge('PM10', data.PM10, 'µg/m³');
+            updateSensorWithGauge('Temperature', data.Temperature, '°C');
+            updateSensorWithGauge('Pressure', data.Pressure, 'Pa');
+            
+            updateLastUpdate();
+        }
+
+        function updateSensorWithGauge(sensor, value, unit) {
+            if (value === undefined || value === null) return;
+            
+            const numValue = parseFloat(value);
+            
+            updateGauge(sensor, numValue);
+            
+            const decimals = sensor === 'Temperature' || sensor === 'Pressure' ? 2 : 0;
+            document.getElementById(`value${sensor}`).textContent = numValue.toFixed(decimals);
+            
+            const status = getStatusInfo(sensor, numValue);
+            const statusBadge = document.getElementById(`status${sensor}`);
+            statusBadge.textContent = status.text;
+            statusBadge.className = `status-badge ${status.class}`;
+            
+            const now = new Date();
+            document.getElementById(`time${sensor}`).textContent = 
+                now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function getStatusInfo(sensor, value) {
+            const threshold = THRESHOLDS[sensor];
+            if (!threshold) return { text: 'Normal', class: 'good' };
+            
+            if (value <= threshold.good) {
+                return { text: 'Bueno', class: 'good' };
+            } else if (value <= threshold.moderate) {
+                return { text: sensor === 'CO2' ? 'Elevado' : 'Moderado', class: 'moderate' };
+            } else {
+                return { text: 'Insalubre', class: 'unhealthy' };
+            }
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = 
+                now.toLocaleString('es-MX', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+        }
+
+        // ========== GAUGES ==========
+        function initializeGauges() {
+            const sensors = ['CO', 'CO2', 'PM25', 'PM10', 'Temperature', 'Pressure'];
+            sensors.forEach(sensor => {
+                const canvas = document.getElementById(`gauge${sensor}`);
+                if (canvas) {
+                    gauges[sensor] = {
+                        canvas: canvas,
+                        ctx: canvas.getContext('2d'),
+                        value: 0
+                    };
+                    drawGauge(sensor, 0);
+                }
+            });
+        }
+
+        function updateGauge(sensor, value) {
+            if (gauges[sensor]) {
+                gauges[sensor].value = value;
+                drawGauge(sensor, value);
+            }
+        }
+
+        function drawGauge(sensor, value) {
+            const gauge = gauges[sensor];
+            if (!gauge) return;
+            
+            const canvas = gauge.canvas;
+            const ctx = gauge.ctx;
+            const threshold = THRESHOLDS[sensor];
+            
+            if (!threshold) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            const width = rect.width;
+            const height = rect.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) / 2 - 10;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            // Background arc
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0.75 * Math.PI, 2.25 * Math.PI);
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = '#E5E7EB';
+            ctx.lineCap = 'round';
+            ctx.stroke();
+            
+            // Value percentage
+            const percentage = Math.min(Math.max((value - threshold.min) / (threshold.max - threshold.min), 0), 1);
+            
+            // Color based on value
+            let color;
+            if (value <= threshold.good) {
+                color = '#10B981';
+            } else if (value <= threshold.moderate) {
+                color = '#F59E0B';
+            } else {
+                color = '#EF4444';
+            }
+            
+            // Value arc
+            const startAngle = 0.75 * Math.PI;
+            const endAngle = startAngle + (percentage * 1.5 * Math.PI);
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = color;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        // ========== UTILITIES ==========
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(tabName).classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+        }
+
+        function refreshData() {
+            console.log('🔄 Actualizando datos...');
+            const btn = event.target.closest('.header-btn');
+            btn.style.transform = 'rotate(360deg)';
+            btn.style.transition = 'transform 0.5s';
+            setTimeout(() => {
+                btn.style.transform = 'rotate(0deg)';
+            }, 500);
+        }
+
+        // ========== INITIALIZATION ==========
+        function initializeApp() {
+            console.log('🚀 Inicializando aplicación...');
+            document.getElementById('loadingOverlay').classList.add('show');
+            
+            initializeGauges();
+            setupFirebaseListeners();
+            connectToParticle();
+            
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.remove('show');
+            }, 1000);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            Object.keys(gauges).forEach(sensor => {
+                drawGauge(sensor, gauges[sensor].value);
+            });
+        });
+    </script>
+</body>
+</html>
